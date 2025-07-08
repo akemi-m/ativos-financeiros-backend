@@ -49,9 +49,9 @@ app.get("/ativos", async (req: any, res: any) => {
     // transformar em json para o front
     res.json(ativos);
 
-  } catch (error) {
+  } catch (error: any) {
     // erro
-    res.status(500).send("Erro ao buscar a lista de ativos financeiros.");
+    res.status(500).send(error.message);
   }
 });
 
@@ -76,9 +76,6 @@ app.post("/ativos", async (req: any, res: any) => {
     // transformar data em json
     const ativos = JSON.parse(dataDB);
 
-    // verificar se já existe no nosso banco o pokémon que a pessos quer adicionar
-    // normalmente o errado dps o correto
-
     // se não tiver algum ativo com mesmo nome e data, vai salvar no banco
     if (!ativos.some((a: any) => a.nome === nome && a.data === data)) {
       ativos.push({
@@ -99,7 +96,7 @@ app.post("/ativos", async (req: any, res: any) => {
 
   } catch (error: any) {
     // erro do servidor
-    res.status(500).send("Erro ao salvar.");
+    res.status(500).send(error.message);
   }
 });
 

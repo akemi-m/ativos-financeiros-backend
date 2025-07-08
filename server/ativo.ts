@@ -9,6 +9,22 @@ export class Ativo {
       throw new Error("Nome do ativo não pode ser vazio.")
     }
 
+    if (nome.length !== 5) {
+      throw new Error("Nome deve ter exatamente 5 caracteres.");
+    }
+
+    for (let i = 0; i < 4; i++) {
+      const letra = nome.charAt(i);
+      if (letra < "A" || letra > "Z") {
+        throw new Error("Os 4 primeiros caracteres do nome devem ser caracteres com letras maiúsculas.");
+      }
+    }
+
+    const ultimoNumero = nome.charAt(4);
+    if (ultimoNumero < "0" || ultimoNumero > "9") {
+      throw new Error("O último caractere do nome deve ser um número.");
+    }
+
     if (typeof valor !== "number" || isNaN(valor) || valor <= 0) {
       throw new Error("Valor do ativo deve ser um número positivo.");
     }
