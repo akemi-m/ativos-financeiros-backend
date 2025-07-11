@@ -73,22 +73,41 @@ app.post("/ativos", async (req: any, res: any) => {
     // transformar data em json
     const ativos = JSON.parse(dataDB);
 
-    // se não tiver algum ativo com mesmo nome e data, vai salvar no banco
-    if (!ativos.some((a: any) => a.nome === nome && a.data === data)) {
-      ativos.push({
-        nome: novoAtivo.nome,
-        valor: novoAtivo.valor,
-        // formato YYYY-MM-DD
-        data: novoAtivo.data.toLocaleDateString("en-CA")
-      });
+    // Verifica se existe um ativo com o mesmo nome e data
+    const objetoExistente = ativos.find(
+      (item: any) => item.nome === novoAtivo.nome && item.data === novoAtivo.data.toLocaleDateString("en-CA")
+    );
+
+    // se tiver, não cadastra
+    if (objetoExistente) {
+      res.status(400).send("Já existe um ativo financeiro com esse nome e essa data.");
+
+      // se não tiver, busca se já está cadastrado o nome do ativo, 
+      // porém com data diferente
+    } else {
+      const ativoMesmoNome = ativos.find(
+        (item: any) => item.nome === novoAtivo.nome && item.data !== novoAtivo.data.toLocaleDateString("en-CA")
+      );
+
+      // se tiver, adiciona o valor na carteira e atualiza para a última data de compra
+      if (ativoMesmoNome) {
+        ativoMesmoNome.valor += novoAtivo.valor;
+        ativoMesmoNome.data = novoAtivo.data.toLocaleDateString("en-CA");
+
+        // se não, cria um novo ativo
+      } else {
+        ativos.push({
+          nome: novoAtivo.nome,
+          valor: novoAtivo.valor,
+          // formato YYYY-MM-DD
+          data: novoAtivo.data.toLocaleDateString("en-CA")
+        });
+      }
 
       // transformar em json e salva no banco de dados
       await fs.writeFile(DB_FILE, JSON.stringify(ativos, null, 2));
 
-      res.status(200).send("Ativo financeiro salvo!");
-
-    } else {
-      res.status(400).send("Já existe um ativo financeiro com esse nome e essa data.");
+      res.status(200).send(ativoMesmoNome ? "Valor somado com sucesso!" : "Ativo financeiro cadastrado com sucesso.");
     }
 
   } catch (error: any) {
