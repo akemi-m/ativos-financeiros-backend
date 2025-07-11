@@ -34,9 +34,6 @@ initDB();
 // api de get - nome da api
 app.get("/ativos", async (req: any, res: any) => {
 
-  // receber do front o limite - definir um valor default
-  const limit = req.query.limit || 10;
-
   // começar a fazer a req da api
   try {
 
